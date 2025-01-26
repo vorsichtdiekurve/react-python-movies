@@ -54,7 +54,7 @@ def get_actor(actor_id: int):
         raise HTTPException(status_code=404, detail="Actor not found")
     return db_actor
 
-@app.delete("/actors/{movie_id}", response_model=schemas.Actor)
+@app.delete("/actors/{actor_id}", response_model=schemas.Actor)
 def delete_actor(actor_id: int):
     db_actor = models.Actor.filter(models.Actor.id == actor_id).first()
     if db_actor is None:

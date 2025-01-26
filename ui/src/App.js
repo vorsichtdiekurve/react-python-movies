@@ -5,11 +5,13 @@ import "milligram";
 import MovieForm from "./MovieForm";
 import MoviesList from "./MoviesList";
 import ActorsList from "./ActorsList"
+import ActorForm from "./ActorForm";
 
 function App() {
     const [movies, setMovies] = useState([]);
     const [addingMovie, setAddingMovie] = useState(false);
     const [actors, setActors] = useState([]);
+    const [addingActor, setAddingActor] = useState(false);
 
     useEffect(() => {
         const fetchMovies = async () => {
@@ -55,6 +57,28 @@ function App() {
         }
     }
 
+    async function handleAddActor(actor) {
+         const response = await fetch('/actors', {
+             method: 'POST',
+             body: JSON.stringify(actor),
+             headers: { 'Content-Type': 'application/json' }
+         });
+         if (response.ok) {
+             const newActor = await response.json();
+             setActors([...actors, newActor]);
+             setAddingActor(false);
+         }
+    }
+
+    async function handleDeleteActor(actor) {
+        const response = await fetch(`/actors/${actor.id}`, {
+            method: 'DELETE'
+        });
+        if (response.ok) {
+            setActors(actors.filter(a => a !== actor));
+        }
+    }
+
     return (
         <div className="container">
             <h1>My favourite movies to watch</h1>
@@ -73,8 +97,13 @@ function App() {
             {actors.length === 0
                 ? <p>No actors yet. Maybe add anyone?</p>
                 : <ActorsList actors={actors}
-                              onDeleteActor={(actor) => {}}
+                              onDeleteActor={(actor) => handleDeleteActor(actor)}
                 />}
+            {addingActor
+                ? <ActorForm onActorSubmit={handleAddActor}
+                             buttonLabel="Add an actor"
+                />
+                : <button onClick={() => setAddingActor(true)}>Add an actor</button>}
         </div>
     );
 }
