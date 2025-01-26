@@ -61,3 +61,14 @@ def delete_actor(actor_id: int):
         raise HTTPException(status_code=404, detail="Actor not found")
     db_actor.delete_instance()
     return db_actor
+
+@app.post("/movies/{movie_id}/actor/{actor_id}", response_model=schemas.Actor)
+def add_actor_to_movie(movie_id: int, actor_id: int):
+    movie = models.Movie.filter(models.Movie.id == movie_id).first()
+    if movie is None:
+        raise HTTPException(status_code=404, detail="Movie not found")
+    actor = models.Actor.filter(models.Actor.id == actor_id).first()
+    if actor is None:
+        raise HTTPException(status_code=404, detail="Actor not found")
+    movie.actors.add(actor)
+    return actor
