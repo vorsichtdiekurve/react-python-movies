@@ -4,10 +4,12 @@ import {useEffect} from "react";
 import "milligram";
 import MovieForm from "./MovieForm";
 import MoviesList from "./MoviesList";
+import ActorsList from "./ActorsList"
 
 function App() {
     const [movies, setMovies] = useState([]);
     const [addingMovie, setAddingMovie] = useState(false);
+    const [actors, setActors] = useState([]);
 
     useEffect(() => {
         const fetchMovies = async () => {
@@ -18,6 +20,17 @@ function App() {
             }
         };
         fetchMovies();
+    }, []);
+
+    useEffect(() => {
+        const fetchActors = async () => {
+            const response = await fetch(`/actors`);
+            if (response.ok) {
+                const actors = await response.json();
+                setActors(actors);
+            }
+        };
+        fetchActors();
     }, []);
 
     async function handleAddMovie(movie) {
@@ -55,6 +68,13 @@ function App() {
                              buttonLabel="Add a movie"
                 />
                 : <button onClick={() => setAddingMovie(true)}>Add a movie</button>}
+
+            <h1>My favourite actors</h1>
+            {actors.length === 0
+                ? <p>No actors yet. Maybe add anyone?</p>
+                : <ActorsList actors={actors}
+                              onDeleteActor={(actor) => {}}
+                />}
         </div>
     );
 }
