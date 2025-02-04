@@ -6,6 +6,7 @@ import MovieForm from "./MovieForm";
 import MoviesList from "./MoviesList";
 import ActorsList from "./ActorsList"
 import ActorForm from "./ActorForm";
+import ActorAssignment from "./ActorAssignment";
 
 function App() {
     const [movies, setMovies] = useState([]);
@@ -14,13 +15,6 @@ function App() {
     const [addingActor, setAddingActor] = useState(false);
 
     useEffect(() => {
-        const fetchMovies = async () => {
-            const response = await fetch(`/movies`);
-            if (response.ok) {
-                const movies = await response.json();
-                setMovies(movies);
-            }
-        };
         fetchMovies();
     }, []);
 
@@ -34,6 +28,14 @@ function App() {
         };
         fetchActors();
     }, []);
+
+    const fetchMovies = async () => {
+        const response = await fetch(`/movies`);
+        if (response.ok) {
+            const movies = await response.json();
+            setMovies(movies);
+        }
+    };
 
     async function handleAddMovie(movie) {
          const response = await fetch('/movies', {
@@ -79,6 +81,19 @@ function App() {
         }
     }
 
+    async function handleAssignActorToMovies(actorId, movieIds) {
+        document.activeElement.blur();
+        for (const movieId of movieIds) {
+            console.log(movieId)
+            const response = await fetch(`/movies/${movieId}/actor/${actorId}`, {
+                method: 'POST'
+            });
+            if (response.ok) {
+                fetchMovies();
+            }
+        }
+    }
+
     return (
         <div className="container">
             <h1>My favourite movies to watch</h1>
@@ -104,6 +119,10 @@ function App() {
                              buttonLabel="Add an actor"
                 />
                 : <button onClick={() => setAddingActor(true)}>Add an actor</button>}
+            <h1>Assign actors to movies</h1>
+            <ActorAssignment actors={actors}
+                             movies={movies}
+                             onAssign={handleAssignActorToMovies}/>
         </div>
     );
 }
